@@ -8,7 +8,6 @@ package projeserver;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-
 import game.Message;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -16,7 +15,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 
 /**
  *
@@ -74,9 +72,11 @@ public class Server extends Thread {
 
     }
 
-   
-
-    
+//    public void SendBroadcast(Message message) throws IOException {
+//        for (ServerClient client : clients) {
+//            client.SendMessage(message);
+//        }
+//    }
 
     @Override
     public void run() {
@@ -87,6 +87,15 @@ public class Server extends Thread {
                 Socket clientSocket = this.serverSocket.accept();
                 System.out.println("Client Geldi..");
                 ServerClient nclient = new ServerClient(clientSocket);
+                if (this.clients.size() == 0) {
+                    nclient.playerTile = "white";
+                    
+                } else {
+                    nclient.playerTile = "black";
+                    nclient.pairedClient = this.clients.get(0);
+                    this.clients.get(0).pairedClient = nclient;
+                    
+                }
                 this.addClient(nclient);
                 nclient.Listen();
 
@@ -96,6 +105,7 @@ public class Server extends Thread {
         }
 
     }
+
     public static void Send(ServerClient cl, Message msg) {
 
         try {

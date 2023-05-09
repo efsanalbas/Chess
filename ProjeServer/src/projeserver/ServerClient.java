@@ -15,6 +15,7 @@ import game.Message;
 import static game.Message.Message_Type.Hamle;
 import static game.Message.Message_Type.Name;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,11 +28,11 @@ public class ServerClient extends Thread {
     int id;
     Socket socket;
     private String playerName;
-
+    String playerTile = "";
     ObjectOutputStream output;
     ObjectInputStream input;
     boolean isListening;
-    private ServerClient pairedClient;
+    public ServerClient pairedClient; //rakibim 
 
     public ServerClient(Socket soket) throws IOException {
         this.socket = soket;
@@ -57,31 +58,52 @@ public class ServerClient extends Thread {
         }
     }
 
-    public void SendMessage(Message messages) throws IOException {
-        output.writeObject(messages);
-
+    public void SendMessage(Message.Message_Type type, String content) {
+        try {
+            Message message = (Message) new Message(Message.Message_Type.Tile);
+            message.content = content;
+            output.writeObject(message);
+        } catch (IOException ex) {
+            Logger.getLogger(ServerClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
     public void run() {
-        Message received = null;
-        try {
-            received = (Message) (input.readObject());
-            System.out.println("Oyuncu adı: " + received.content.toString());
-        } catch (IOException ex) {
-            System.out.println("Hata: İlk mesaj alınamadı.");
-        } catch (ClassNotFoundException ex) {
-            System.out.println("Hata: Class not found exception.");
+
+        //Player tile bağlanan clienta bildirilir.
+        this.SendMessage(Message.Message_Type.Tile, playerTile);
+
+        if (this.pairedClient != null) { //nulll değilse ikiisi birbirine bağlanmıştır, öbürü burayı atlamıştır.(white)
+
+            this.SendMessage(Message.Message_Type.Turn, this.pairedClient.playerTile);
+            this.pairedClient.SendMessage(Message.Message_Type.Turn, this.pairedClient.playerTile); //rakibime ve bana gönderiyorum.
         }
+
+        Message received = null;
 
         while (this.isListening) {
             try {
+
                 received = (Message) (input.readObject());
-                if (received.type == Message.Message_Type.Hamle) {
-                    String move = (String) received.content;
-                    System.out.println("Hamle alındı: " + move);
-                    // hamleyi işleme kodları burada yazılır
+                switch (received.type) {
+                    case Name:
+                         System.out.println("Oyuncu adı:"+received.content.toString());
+                        break;
+                    case Hamle:
+
+                        String move = (String) received.content;
+                        String[] arrMoves = move.split(" to ");
+                        System.out.println(Arrays.toString(arrMoves));
+                        this.pairedClient.SendMessage(Message.Message_Type.Hamle, move);
+                        break;
+
+                    case Turn:
+                        break;
+                    case Tile:
+                        break;
                 }
+
             } catch (IOException ex) {
                 System.out.println("Hata: Mesaj alınamadı.");
             } catch (ClassNotFoundException ex) {
@@ -89,6 +111,5 @@ public class ServerClient extends Thread {
             }
         }
     }
+
 }
-
-

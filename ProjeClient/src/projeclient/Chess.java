@@ -11,6 +11,7 @@ package projeclient;
 import game.Message;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,14 +22,17 @@ import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class Chess {
     //framedeki komponentlere erişim için satatik oyun değişkeni
 
+    public static boolean isWhiteTurn = true;
     public static Chess thisGame;
     public static MyPanel currentClickedPanel;
+    public static MyButton currentClickedButton;
 
     static int k = 8, l = 8, m = 8, n = 8, p = 8, r = 8, s = 8, t = 8;
     static JFrame frame = new JFrame("Board");
@@ -36,9 +40,10 @@ public class Chess {
     static Color color2 = new Color(237, 211, 169);
     static ArrayList<MyPanel> myPanels = new ArrayList<>();
     static ArrayList<MyButton> myButtons = new ArrayList<>();
+    static ArrayList<MyButton> blackTiles = new ArrayList<>();
+    static ArrayList<MyButton> whiteTiles = new ArrayList<>();
     static ArrayList<MyPanel> currentAvaliableSquares = new ArrayList<>();
     static OutputStream clientOutput;
-    static byte bytes[];
     static int rowCount = 8;
     static int columnCount = 8;
     static MyPanel[][] board = new MyPanel[rowCount][columnCount];
@@ -51,13 +56,19 @@ public class Chess {
         thisGame = this;
     }
 
-    public static void addButton(ArrayList panels, MyPanel panel, ArrayList buttons, String pieceName) {
+    public static void addButton(ArrayList panels, MyPanel panel, ArrayList buttons, String pieceName, String tileColor) {
         MyButton button = new MyButton();
         ImageIcon icon = new ImageIcon(pieceName);
         button.setIcon(icon);
         button.buttonIndex = panel.name;
         button.locatedPanel = panel;
         button.type = pieceName;
+        button.tileColor = tileColor;
+        if (tileColor.equals("black")) {
+            blackTiles.add(button);
+        } else {
+            whiteTiles.add(button);
+        }
         buttons.add(button);
         panel.add(button);
 
@@ -154,42 +165,42 @@ public class Chess {
                 }
 
                 if (square.name.startsWith("G")) {
-                    addButton(myPanels, square, myButtons, "pawnBlack.png");
+                    addButton(myPanels, square, myButtons, "pawnBlack.png", "black");
                 }
                 if (square.name.startsWith("B")) {
-                    addButton(myPanels, square, myButtons, "pawnWhite.png");
+                    addButton(myPanels, square, myButtons, "pawnWhite.png", "white");
                 }
                 if (square.name.contains("A8") || square.name.contains("A1")) {
-                    addButton(myPanels, square, myButtons, "rookWhite.png");
+                    addButton(myPanels, square, myButtons, "rookWhite.png", "white");
                 }
                 if (square.name.contains("H1") || square.name.contains("H8")) {
-                    addButton(myPanels, square, myButtons, "rookBlack.png");
+                    addButton(myPanels, square, myButtons, "rookBlack.png", "black");
                 }
                 if (square.name.contains("A7") || square.name.contains("A2")) {
-                    addButton(myPanels, square, myButtons, "horseWhite.png");
+                    addButton(myPanels, square, myButtons, "horseWhite.png", "white");
                 }
                 if (square.name.contains("H7") || square.name.contains("H2")) {
-                    addButton(myPanels, square, myButtons, "horseBlack.png");
+                    addButton(myPanels, square, myButtons, "horseBlack.png", "black");
                 }
                 if (square.name.contains("A6") || square.name.contains("A3")) {
-                    addButton(myPanels, square, myButtons, "bishopWhite.png");
+                    addButton(myPanels, square, myButtons, "bishopWhite.png", "white");
                 }
                 if (square.name.contains("H6") || square.name.contains("H3")) {
-                    addButton(myPanels, square, myButtons, "bishopBlack.png");
+                    addButton(myPanels, square, myButtons, "bishopBlack.png", "black");
                 }
 
                 if (square.name.contains("A5")) {
-                    addButton(myPanels, square, myButtons, "kingWhite.png");
+                    addButton(myPanels, square, myButtons, "kingWhite.png", "white");
 
                 }
                 if (square.name.contains("H5")) {
-                    addButton(myPanels, square, myButtons, "kingBlack.png");
+                    addButton(myPanels, square, myButtons, "kingBlack.png", "black");
                 }
                 if (square.name.endsWith("A4")) {
-                    addButton(myPanels, square, myButtons, "queenWhite.png");
+                    addButton(myPanels, square, myButtons, "queenWhite.png", "white");
                 }
                 if (square.name.endsWith("H4")) {
-                    addButton(myPanels, square, myButtons, "queenBlack.png");
+                    addButton(myPanels, square, myButtons, "queenBlack.png", "black");
                 }
                 board[i][j] = square;
                 myPanels.add(square);
@@ -216,11 +227,19 @@ public class Chess {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setBounds(350, 350, 800, 800);
         frame.setVisible(true);
-
     }
 
     public void gameBoard() {
         gameScreen();
+//        if (isWhiteTurn == false) {
+//            for (int j = 0; j < whiteTiles.size(); j++) {//butonu bulmak için
+//                whiteTiles.get(j).setEnabled(false);
+//            }
+//        } else {
+//            for (int j = 0; j < blackTiles.size(); j++) {//butonu bulmak için
+//                blackTiles.get(j).setEnabled(false);
+//            }
+//        }
         for (int j = 0; j < myButtons.size(); j++) {//butonu bulmak için
             isClicked(myButtons.get(j));
         }
@@ -231,9 +250,10 @@ public class Chess {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     myPanels.get(index).setClicked(true);
+                    makeMove(currentClickedButton, myPanels.get(index));
                     System.out.println(myPanels.get(index).name + " clicked");
                     Message msg = new Message(Message.Message_Type.Hamle);
-                    msg.content = currentClickedPanel.name + " to " + myPanels.get(index).name;
+                    msg.content = currentClickedButton.tileColor + " to " + currentClickedPanel.name + " to " + myPanels.get(index).name;
                     Client.Send(msg);
                     myPanels.get(index).repaint();
                 }
@@ -259,18 +279,34 @@ public class Chess {
 
                 MyButton clickedButton = (MyButton) e.getSource();
                 MyPanel parentPanel = (MyPanel) clickedButton.getParent();
-
+                currentClickedButton = clickedButton;
                 parentPanel.setBackground(Color.green);
                 currentPanel = parentPanel;
-                //yorum satırına aldığım yerlerin kontrolleri serverda yapılacak
-                //servera bütün hamlelerin neden gitmediği sorunu çözülecek
-                //serverda çalışan kısımlar thread kullanılarak yeniden tasarlanacak.
-
                 System.out.println("Clicked button is on panel: " + parentPanel);
                 currentClickedPanel = parentPanel;
 
             }
         });
+    }
+
+    public static void makeMove(MyButton tile, MyPanel square) {
+        if (!square.panelHasButton().equals("blank") && square.panelHasButton().equals(tile.tileColor)) { //Gidilmek istenen konum boş değilse ya da aynı renk taş içeriyorsa hamle yapılamaz.
+            JOptionPane.showMessageDialog(null, "Invalid move", "Square Filled", JOptionPane.WARNING_MESSAGE);
+        }
+        if (!square.panelHasButton().equals(tile.tileColor) && !square.panelHasButton().equals("blank")) {
+            tile.locatedPanel.remove(tile);
+            tile.locatedPanel.setBackground(tile.locatedPanel.previousColor);
+            square.remove(square.panelIncludeButton());
+            square.add(tile);
+            square.repaint();
+            currentClickedPanel.repaint();
+        } else {
+            tile.locatedPanel.remove(tile);
+            tile.locatedPanel.setBackground(tile.locatedPanel.previousColor);
+            square.add(tile);
+            square.repaint();
+            currentClickedPanel.repaint();
+        }
     }
 
     public static void main(String[] args) throws InterruptedException {

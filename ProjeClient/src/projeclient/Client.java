@@ -26,20 +26,33 @@ class Listen extends Thread {
         Message msg1 = new Message(Message.Message_Type.Name);
         msg1.content = Chess.usernameField.getText();
         Client.Send(msg1);
-      
-          
-        
+
         while (Client.socket.isConnected()) {
             try {
+
                 Message received = (Message) (Client.input.readObject());
                 switch (received.type) {
                     case Name:
                         break;
                     case Hamle:
-//                        System.out.println("Hamle:"+received.content.toString() );
-//                          sendMove(received.content.toString());
+                        System.out.println("Hamle:"+received.content.toString() );
+                          sendMove(received.content.toString());
                         break;
+                    case Turn:
+                        if (received.content.equals(Client.myTile)) {
+                            Client.isMyTurn = true;
+                        } else {
+                            Client.isMyTurn = false;
+                        }
 
+                        break;
+                    case Tile:
+                        if (received.content.toString().equals("white")) {
+                            Client.myTile = "white";
+                        } else {
+                            Client.myTile = "black";
+                        }
+                        break;
                 }
             } catch (IOException ex) {
                 Logger.getLogger(Listen.class.getName()).log(Level.SEVERE, null, ex);
@@ -59,6 +72,8 @@ public class Client {
     public static ObjectInputStream input;   //verileri göndermek için gerekli nesne
     public static ObjectOutputStream output;  //serverı dinleme thredi 
     public static Listen listenMe;
+    public static String myTile;
+    public static Boolean isMyTurn;
 
     public static void Start(String ip, int port) {
         try {

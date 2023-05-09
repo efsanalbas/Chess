@@ -4,6 +4,7 @@
  */
 package projeclient;
 
+import java.awt.Component;
 import java.util.ArrayList;
 
 /**
@@ -15,6 +16,7 @@ public class MyButton extends javax.swing.JButton {
     public String buttonIndex;
     public MyPanel locatedPanel;
     public String type;
+    public String tileColor;
 
     ArrayList<Character> avaliableWhitePawnLocations(MyButton pawn, int stepSize) {
         char currentLocation = pawn.locatedPanel.row;
@@ -47,4 +49,6 @@ public class MyButton extends javax.swing.JButton {
         }
         return nextCharArr;
     }
+
+
 }
