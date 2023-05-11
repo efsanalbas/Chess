@@ -27,12 +27,12 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class Chess {
-    //framedeki komponentlere erişim için satatik oyun değişkeni
 
     public static boolean isWhiteTurn = true;
     public static Chess thisGame;
     public static MyPanel currentClickedPanel;
     public static MyButton currentClickedButton;
+    public static MyPanel rivalsPanel;
 
     static int k = 8, l = 8, m = 8, n = 8, p = 8, r = 8, s = 8, t = 8;
     static JFrame frame = new JFrame("Board");
@@ -56,17 +56,18 @@ public class Chess {
         thisGame = this;
     }
 
-    public static void addButton(ArrayList panels, MyPanel panel, ArrayList buttons, String pieceName, String tileColor) {
+    public static void addButton(ArrayList panels, MyPanel panel, ArrayList buttons, String pieceName, String tileColor, String type) {
         MyButton button = new MyButton();
         ImageIcon icon = new ImageIcon(pieceName);
         button.setIcon(icon);
         button.buttonIndex = panel.name;
         button.locatedPanel = panel;
-        button.type = pieceName;
+        button.type = type;
         button.tileColor = tileColor;
         if (tileColor.equals("black")) {
             blackTiles.add(button);
-        } else {
+        }
+        if (tileColor.equals("white")) {
             whiteTiles.add(button);
         }
         buttons.add(button);
@@ -165,42 +166,42 @@ public class Chess {
                 }
 
                 if (square.name.startsWith("G")) {
-                    addButton(myPanels, square, myButtons, "pawnBlack.png", "black");
+                    addButton(myPanels, square, myButtons, "pawnBlack.png", "black", "pawn");
                 }
                 if (square.name.startsWith("B")) {
-                    addButton(myPanels, square, myButtons, "pawnWhite.png", "white");
+                    addButton(myPanels, square, myButtons, "pawnWhite.png", "white", "pawn");
                 }
                 if (square.name.contains("A8") || square.name.contains("A1")) {
-                    addButton(myPanels, square, myButtons, "rookWhite.png", "white");
+                    addButton(myPanels, square, myButtons, "rookWhite.png", "white", "rook");
                 }
                 if (square.name.contains("H1") || square.name.contains("H8")) {
-                    addButton(myPanels, square, myButtons, "rookBlack.png", "black");
+                    addButton(myPanels, square, myButtons, "rookBlack.png", "black", "rook");
                 }
                 if (square.name.contains("A7") || square.name.contains("A2")) {
-                    addButton(myPanels, square, myButtons, "horseWhite.png", "white");
+                    addButton(myPanels, square, myButtons, "horseWhite.png", "white", "horse");
                 }
                 if (square.name.contains("H7") || square.name.contains("H2")) {
-                    addButton(myPanels, square, myButtons, "horseBlack.png", "black");
+                    addButton(myPanels, square, myButtons, "horseBlack.png", "black", "horse");
                 }
                 if (square.name.contains("A6") || square.name.contains("A3")) {
-                    addButton(myPanels, square, myButtons, "bishopWhite.png", "white");
+                    addButton(myPanels, square, myButtons, "bishopWhite.png", "white", "bishop");
                 }
                 if (square.name.contains("H6") || square.name.contains("H3")) {
-                    addButton(myPanels, square, myButtons, "bishopBlack.png", "black");
+                    addButton(myPanels, square, myButtons, "bishopBlack.png", "black", "bishop");
                 }
 
                 if (square.name.contains("A5")) {
-                    addButton(myPanels, square, myButtons, "kingWhite.png", "white");
+                    addButton(myPanels, square, myButtons, "kingWhite.png", "white", "king");
 
                 }
                 if (square.name.contains("H5")) {
-                    addButton(myPanels, square, myButtons, "kingBlack.png", "black");
+                    addButton(myPanels, square, myButtons, "kingBlack.png", "black", "king");
                 }
                 if (square.name.endsWith("A4")) {
-                    addButton(myPanels, square, myButtons, "queenWhite.png", "white");
+                    addButton(myPanels, square, myButtons, "queenWhite.png", "white", "queen");
                 }
                 if (square.name.endsWith("H4")) {
-                    addButton(myPanels, square, myButtons, "queenBlack.png", "black");
+                    addButton(myPanels, square, myButtons, "queenBlack.png", "black", "queen");
                 }
                 board[i][j] = square;
                 myPanels.add(square);
@@ -222,6 +223,10 @@ public class Chess {
                 Client.Start("127.0.0.1", 3000);
             }
         });
+
+        for (int j = 0; j < myButtons.size(); j++) {//butonu bulmak için
+            isClicked(myButtons.get(j));
+        }
         frame.add(mainPanel);
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -231,18 +236,6 @@ public class Chess {
 
     public void gameBoard() {
         gameScreen();
-//        if (isWhiteTurn == false) {
-//            for (int j = 0; j < whiteTiles.size(); j++) {//butonu bulmak için
-//                whiteTiles.get(j).setEnabled(false);
-//            }
-//        } else {
-//            for (int j = 0; j < blackTiles.size(); j++) {//butonu bulmak için
-//                blackTiles.get(j).setEnabled(false);
-//            }
-//        }
-        for (int j = 0; j < myButtons.size(); j++) {//butonu bulmak için
-            isClicked(myButtons.get(j));
-        }
 
         for (int i = 0; i < myPanels.size(); i++) {
             final int index = i;
@@ -250,7 +243,7 @@ public class Chess {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     myPanels.get(index).setClicked(true);
-                    makeMove(currentClickedButton, myPanels.get(index));
+                    moveControl(currentClickedButton, myPanels.get(index));
                     System.out.println(myPanels.get(index).name + " clicked");
                     Message msg = new Message(Message.Message_Type.Hamle);
                     msg.content = currentClickedButton.tileColor + " to " + currentClickedPanel.name + " to " + myPanels.get(index).name;
@@ -297,6 +290,7 @@ public class Chess {
             tile.locatedPanel.remove(tile);
             tile.locatedPanel.setBackground(tile.locatedPanel.previousColor);
             square.remove(square.panelIncludeButton());
+            tile.locatedPanel = square;
             square.add(tile);
             square.repaint();
             currentClickedPanel.repaint();
@@ -304,9 +298,211 @@ public class Chess {
             tile.locatedPanel.remove(tile);
             tile.locatedPanel.setBackground(tile.locatedPanel.previousColor);
             square.add(tile);
+            tile.locatedPanel = square;
             square.repaint();
             currentClickedPanel.repaint();
         }
+    }
+
+    public static void moveControl(MyButton tile, MyPanel square) {
+        int currentRow = tile.locatedPanel.row;
+        int currentColumn = Integer.parseInt(tile.locatedPanel.column);
+        int destinationRow = square.row;
+        int destinationColumn = Integer.parseInt(square.column);
+
+        if (tile.type.equals("pawn")) {
+            // Piyonlar beyazsa sadece ileri yöne gidebilir
+            if (tile.tileColor.equals("white")) {
+                if (destinationRow == currentRow + 1 && destinationColumn == currentColumn) {
+                    makeMove(tile, square);
+                } else if (currentRow == 66 && destinationRow == 68 && destinationColumn == currentColumn) {
+                    makeMove(tile, square);
+                } else if (!tile.tileColor.equals(square.panelIncludeButton().tileColor) && Math.abs(currentColumn - destinationColumn) == 1 && Math.abs(currentRow - destinationRow) == 1) {
+                    makeMove(tile, square);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Invalid move", "Pawn cannot move like this.", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+            } else {//Piyonlar siyahsa geri yöne de gidebilir.
+                if (destinationRow == currentRow - 1 && destinationColumn == currentColumn) {
+                    makeMove(tile, square);
+                } else if (currentRow == 71 && destinationRow == 69 && destinationColumn == currentColumn) {
+                    makeMove(tile, square);
+                } else if (!tile.tileColor.equals(square.panelIncludeButton().tileColor) && Math.abs(currentColumn - destinationColumn) == 1 && Math.abs(currentRow - destinationRow) == 1) {
+                    makeMove(tile, square);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Invalid move", "Pawn cannot move like this.", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+            }
+        }
+        if (tile.type.equals("rook")) {
+            // İleri, geri, sağa ve sola hareket için koşullar kontrol edilir
+            if (currentColumn == destinationColumn) {
+                // Dikey hareketler
+                if (destinationRow > currentRow) {
+                    // İleri hareket
+                    for (int i = currentRow + 1; i < destinationRow; i++) {
+                        MyPanel panel = getPanelFromName(squareName(i, currentColumn));
+                        if (panel != null && !panel.panelHasButton().equals("blank")) {
+                            JOptionPane.showMessageDialog(null, "Invalid move", "Square Filled", JOptionPane.WARNING_MESSAGE);
+                            return;
+                        }
+                    }
+                    makeMove(tile, square);
+                } else {
+                    // Geri hareket
+                    for (int i = currentRow - 1; i > destinationRow; i--) {
+                        MyPanel panel = getPanelFromName(squareName(i, currentColumn));
+                        if (panel != null && !panel.panelHasButton().equals("blank")) {
+                            JOptionPane.showMessageDialog(null, "Invalid move", "Square Filled", JOptionPane.WARNING_MESSAGE);
+                            return;
+                        }
+                    }
+                    makeMove(tile, square);
+                }
+            } else if (currentRow == destinationRow) {
+                // Yatay hareketler
+                if (destinationColumn > currentColumn) {
+                    // Sağa hareket
+                    for (int i = currentColumn + 1; i < destinationColumn; i++) {
+                        MyPanel panel = getPanelFromName(squareName(currentRow, i));
+                        if (panel != null && !panel.panelHasButton().equals("blank")) {
+                            JOptionPane.showMessageDialog(null, "Invalid move", "Square Filled", JOptionPane.WARNING_MESSAGE);
+                            return;
+                        }
+                    }
+                    makeMove(tile, square);
+                } else {
+                    // Sola hareket
+                    for (int i = currentColumn - 1; i > destinationColumn; i--) {
+                        MyPanel panel = getPanelFromName(squareName(currentRow, i));
+                        if (panel != null && !panel.panelHasButton().equals("blank")) {
+                            JOptionPane.showMessageDialog(null, "Invalid move", "Square Filled", JOptionPane.WARNING_MESSAGE);
+                            return;
+                        }
+                    }
+                    makeMove(tile, square);
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Rook cannot move like this.", "Invalid Move", JOptionPane.WARNING_MESSAGE);
+            }
+        }
+        if (tile.type.equals("bishop")) { //Fil çapraz sağ, sol, ve bu yönler için geri hareket eder
+            int rowDifference = Math.abs(destinationRow - currentRow);
+            int columnDifference = Math.abs(destinationColumn - currentColumn);
+
+            // Çapraz hareket yapmak için satır ve sütunların farkı eşit olmalı
+            if (rowDifference == columnDifference) {
+                // Çapraz sağa-ileri
+                if (destinationRow < currentRow && destinationColumn > currentColumn) {
+                    for (int i = 1; i < rowDifference; i++) {
+                        MyPanel panel = getPanelFromName(squareName(currentRow - i, currentColumn + i));
+                        if (panel != null && !panel.panelHasButton().equals("blank")) {
+                            JOptionPane.showMessageDialog(null, "Invalid move", "Square Filled", JOptionPane.WARNING_MESSAGE);
+                            return;
+                        }
+                    }
+                    makeMove(tile, square);
+
+                } // Çapraz sola-ileri
+                else if (destinationRow < currentRow && destinationColumn < currentColumn) {
+                    for (int i = 1; i < rowDifference; i++) {
+                        MyPanel panel = getPanelFromName(squareName(currentRow - i, currentColumn - i));
+                        if (panel != null && !panel.panelHasButton().equals("blank")) {
+                            JOptionPane.showMessageDialog(null, "Square Filled", "Invalid move", JOptionPane.WARNING_MESSAGE);
+                            return;
+                        }
+                    }
+                    makeMove(tile, square);
+
+                } // Çapraz sağa-geri
+                else if (destinationRow > currentRow && destinationColumn > currentColumn) {
+                    for (int i = 1; i < rowDifference; i++) {
+                        MyPanel panel = getPanelFromName(squareName(currentRow + i, currentColumn + i));
+                        if (panel != null && !panel.panelHasButton().equals("blank")) {
+                            JOptionPane.showMessageDialog(null, "Square Filled", "Invalid move", JOptionPane.WARNING_MESSAGE);
+                            return;
+                        }
+                    }
+                    makeMove(tile, square);
+
+                } // Çapraz sola-geri
+                else if (destinationRow > currentRow && destinationColumn < currentColumn) {
+                    for (int i = 1; i < rowDifference; i++) {
+                        MyPanel panel = getPanelFromName(squareName(currentRow + i, currentColumn - i));
+                        if (panel != null && !panel.panelHasButton().equals("blank")) {
+                            JOptionPane.showMessageDialog(null, "Invalid move", "Square Filled", JOptionPane.WARNING_MESSAGE);
+                            return;
+                        }
+                    }
+                    makeMove(tile, square);
+                }
+                // Yeme durumu
+                if (!tile.tileColor.equals(square.panelIncludeButton().tileColor)) {
+                    makeMove(tile, square);
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Bishop cannot move like this.", "Invalid move", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+        }
+        if (tile.type.equals("horse")) {
+            // At 2 kare yuları sağ ya da sol yöne doğru hareket eder.
+            int rowDifference = Math.abs(destinationRow - currentRow);
+            int columnDifference = Math.abs(destinationColumn - currentColumn);
+            //her iki taş içinde aynı şekilde konumlar hesaplanır.
+            if ((rowDifference == 2 && columnDifference == 1) || (rowDifference == 1 && columnDifference == 2)) {
+                // Hedef kare boş veya rakip taşının olduğu kare ise hamle yapılabilir
+                if (square.panelHasButton().equals("blank") || !tile.tileColor.equals(square.panelIncludeButton().tileColor)) {
+                    makeMove(tile, square);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Invalid move", "Cannot move there", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Invalid move", "Knight cannot move like this.", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+        }
+        if (tile.type.equals("king")) {
+            //Şah sadece 1 kare şeklinde hareket edebilir.
+            int rowDifference = Math.abs(destinationRow - currentRow);
+            int columnDifference = Math.abs(destinationColumn - currentColumn);
+            if ((rowDifference == 1 && columnDifference == 0) || (rowDifference == 0 && columnDifference == 1) || (rowDifference == 1 && columnDifference == 1)) {
+                // Önündeki kare boş ise şah ilerler veya karede rakip taş var ise şah rakibi yiyebilir.
+                if (square.panelHasButton().equals("blank") || !tile.tileColor.equals(square.panelIncludeButton().tileColor)) {
+                    makeMove(tile, square);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Invalid move", "Cannot move to this square", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Invalid move", "King cannot move like this.", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+        }
+        if (tile.type.equals("queen")) {
+            //buraya gerekli kontrolleri ekleyeceğim.
+            makeMove(tile, square);
+        }
+
+    }
+
+    public static String squareName(int row, int column) {
+        // satırı sütuna karşılık gelen harflerle birleştirerek kare ismini oluşturur.
+        char col = (char) ('A' + column);
+        char rw = (char) ('8' - row);
+        return "" + col + rw;
+    }
+
+    public static MyPanel getPanelFromName(String name) {
+        for (MyPanel panel : myPanels) {
+            if (panel.name.equals(name)) {
+                return panel;
+            }
+        }
+        return null;
     }
 
     public static void main(String[] args) throws InterruptedException {

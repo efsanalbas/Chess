@@ -25,6 +25,7 @@ public class MyPanel extends JPanel {
     public char row;//A,B,C,D,E,F,G,H
     public String column;//1,2,3,4,5,6,7,8   
     public boolean isClicked;
+
     public MyPanel() {
         super();
         this.name = name;
@@ -53,6 +54,7 @@ public class MyPanel extends JPanel {
         }
         return "blank";
     }
+
     public MyButton panelIncludeButton() {
         Component[] components = this.getComponents();
         for (Component component : components) {
@@ -62,7 +64,23 @@ public class MyPanel extends JPanel {
         }
         return null;
     }
+
     public void setClicked(boolean clicked) {
         isClicked = clicked;
     }
+
+    public String getNameFromThePanel(MyPanel panel) {
+        // satır bilgisini al
+        char row = panel.row;
+
+        // sütun bilgisini al
+        String column = panel.column;
+
+        // satır ve sütunu birleştirerek panel adını oluştur
+        String panelName = String.valueOf(row) + column;
+
+        return panelName;
+    }
+
+    
 }

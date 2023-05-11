@@ -35,8 +35,8 @@ class Listen extends Thread {
                     case Name:
                         break;
                     case Hamle:
-                        System.out.println("Hamle:"+received.content.toString() );
-                          sendMove(received.content.toString());
+//                        System.out.println("Hamle:"+received.content.toString() );
+//                          sendMove(received.content.toString());
                         break;
                     case Turn:
                         if (received.content.equals(Client.myTile)) {
@@ -49,8 +49,22 @@ class Listen extends Thread {
                     case Tile:
                         if (received.content.toString().equals("white")) {
                             Client.myTile = "white";
+                            System.out.println("white da");
+//                            for (int j = 0; j < Chess.blackTiles.size(); j++) {//butonu bulmak için
+//                                Chess.blackTiles.get(j).setEnabled(false);
+//                            }
+//                            for (int i = 0; i < Chess.blackTiles.size(); i++) {
+//                                System.out.println("***Black tiles***" + Chess.blackTiles.get(i).buttonIndex);
+//                            }
                         } else {
                             Client.myTile = "black";
+                            System.out.println("Blackte");
+//                            for (int i = 0; i < Chess.whiteTiles.size(); i++) {
+//                                System.out.println("*****White tiles*****" + Chess.whiteTiles.get(i).buttonIndex);
+//                            }
+//                            for (int j = 0; j < Chess.whiteTiles.size(); j++) {//butonu bulmak için
+//                                Chess.whiteTiles.get(j).setEnabled(false);
+//                            }
                         }
                         break;
                 }
@@ -61,6 +75,7 @@ class Listen extends Thread {
             }
 
         }
+
     }
 
 }

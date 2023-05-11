@@ -74,7 +74,7 @@ public class ServerClient extends Thread {
         //Player tile bağlanan clienta bildirilir.
         this.SendMessage(Message.Message_Type.Tile, playerTile);
 
-        if (this.pairedClient != null) { //nulll değilse ikiisi birbirine bağlanmıştır, öbürü burayı atlamıştır.(white)
+        if (this.pairedClient != null) { //null değilse ikisi birbirine bağlanmıştır, öbürü burayı atlamıştır.(white)
 
             this.SendMessage(Message.Message_Type.Turn, this.pairedClient.playerTile);
             this.pairedClient.SendMessage(Message.Message_Type.Turn, this.pairedClient.playerTile); //rakibime ve bana gönderiyorum.
