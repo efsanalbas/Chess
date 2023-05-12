@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,6 +28,7 @@ public class Server extends Thread {
     boolean isListening;
     ArrayList<ServerClient> clients;
     //Thread listenThread;
+    public static Semaphore pairTwo = new Semaphore(1, true);
 
     public Server(int port) {
         try {
@@ -77,7 +79,6 @@ public class Server extends Thread {
 //            client.SendMessage(message);
 //        }
 //    }
-
     @Override
     public void run() {
 
@@ -87,14 +88,14 @@ public class Server extends Thread {
                 Socket clientSocket = this.serverSocket.accept();
                 System.out.println("Client Geldi..");
                 ServerClient nclient = new ServerClient(clientSocket);
-                if (this.clients.size() == 0) {
+                if (this.clients.size() % 2 == 0) {
                     nclient.playerTile = "white";
-                    
+
                 } else {
                     nclient.playerTile = "black";
                     nclient.pairedClient = this.clients.get(0);
                     this.clients.get(0).pairedClient = nclient;
-                    
+
                 }
                 this.addClient(nclient);
                 nclient.Listen();

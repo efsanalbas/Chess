@@ -26,7 +26,6 @@ class Listen extends Thread {
         Message msg1 = new Message(Message.Message_Type.Name);
         msg1.content = Chess.usernameField.getText();
         Client.Send(msg1);
-
         while (Client.socket.isConnected()) {
             try {
 
@@ -35,36 +34,29 @@ class Listen extends Thread {
                     case Name:
                         break;
                     case Hamle:
-//                        System.out.println("Hamle:"+received.content.toString() );
-//                          sendMove(received.content.toString());
+                        System.out.println("Hamle:" + received.content.toString());
+                        String[] arrMoves = received.content.toString().split(" to ");
+                        Chess.rivalMoveTileName = arrMoves[1];
+                        System.out.println("Chess.rivalMoveTileName:" + Chess.rivalMoveTileName);
+                        Chess.rivalMovePanelName = arrMoves[2];
+                        System.out.println(" Chess.rivalMovePanelName:" + Chess.rivalMovePanelName);
+
                         break;
                     case Turn:
-                        if (received.content.equals(Client.myTile)) {
+                        if (received.content.toString().equals(Client.myTile)) {
                             Client.isMyTurn = true;
                         } else {
                             Client.isMyTurn = false;
                         }
 
                         break;
+
                     case Tile:
                         if (received.content.toString().equals("white")) {
                             Client.myTile = "white";
-                            System.out.println("white da");
-//                            for (int j = 0; j < Chess.blackTiles.size(); j++) {//butonu bulmak için
-//                                Chess.blackTiles.get(j).setEnabled(false);
-//                            }
-//                            for (int i = 0; i < Chess.blackTiles.size(); i++) {
-//                                System.out.println("***Black tiles***" + Chess.blackTiles.get(i).buttonIndex);
-//                            }
+
                         } else {
                             Client.myTile = "black";
-                            System.out.println("Blackte");
-//                            for (int i = 0; i < Chess.whiteTiles.size(); i++) {
-//                                System.out.println("*****White tiles*****" + Chess.whiteTiles.get(i).buttonIndex);
-//                            }
-//                            for (int j = 0; j < Chess.whiteTiles.size(); j++) {//butonu bulmak için
-//                                Chess.whiteTiles.get(j).setEnabled(false);
-//                            }
                         }
                         break;
                 }
@@ -88,6 +80,7 @@ public class Client {
     public static ObjectOutputStream output;  //serverı dinleme thredi 
     public static Listen listenMe;
     public static String myTile;
+    public static String id;
     public static Boolean isMyTurn;
 
     public static void Start(String ip, int port) {

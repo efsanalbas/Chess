@@ -11,7 +11,6 @@ package projeclient;
 import game.Message;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,6 +32,10 @@ public class Chess {
     public static MyPanel currentClickedPanel;
     public static MyButton currentClickedButton;
     public static MyPanel rivalsPanel;
+    public static MyButton rivalMoveTile;
+    public static String rivalMoveTileName;
+    public static MyPanel rivalMovePanel;
+    public static String rivalMovePanelName;
 
     static int k = 8, l = 8, m = 8, n = 8, p = 8, r = 8, s = 8, t = 8;
     static JFrame frame = new JFrame("Board");
@@ -234,7 +237,7 @@ public class Chess {
         frame.setVisible(true);
     }
 
-    public void gameBoard() {
+    public static void gameBoard() {
         gameScreen();
 
         for (int i = 0; i < myPanels.size(); i++) {
@@ -242,17 +245,25 @@ public class Chess {
             myPanels.get(index).addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    myPanels.get(index).setClicked(true);
-                    moveControl(currentClickedButton, myPanels.get(index));
-                    System.out.println(myPanels.get(index).name + " clicked");
-                    Message msg = new Message(Message.Message_Type.Hamle);
-                    msg.content = currentClickedButton.tileColor + " to " + currentClickedPanel.name + " to " + myPanels.get(index).name;
-                    Client.Send(msg);
-                    myPanels.get(index).repaint();
+                    if (currentClickedButton.tileColor != null && Client.myTile.equals(currentClickedButton.tileColor)) {
+                        myPanels.get(index).setClicked(true);
+                        moveControl(currentClickedButton, myPanels.get(index));
+                        System.out.println(myPanels.get(index).name + " clicked");
+                        Message msg = new Message(Message.Message_Type.Hamle);
+                        msg.content = currentClickedButton.tileColor + " to " + currentClickedPanel.name + " to " + myPanels.get(index).name;
+                        Client.Send(msg);
+
+                        // Rakibin ekranını güncelliyoruz
+                        if (rivalMoveTileName != null && rivalMovePanelName != null) {
+                            rivalMoveTile = getPanelFromName(rivalMoveTileName).panelIncludeButton();
+                            rivalMovePanel= getPanelFromName(rivalMovePanelName);
+                            moveControl(rivalMoveTile, rivalMovePanel);
+                        }
+
+                    }
                 }
             });
         }
-
     }
 
     public static void isClicked(MyButton button) {

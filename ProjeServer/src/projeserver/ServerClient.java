@@ -60,7 +60,7 @@ public class ServerClient extends Thread {
 
     public void SendMessage(Message.Message_Type type, String content) {
         try {
-            Message message = (Message) new Message(Message.Message_Type.Tile);
+            Message message = (Message) new Message(type);
             message.content = content;
             output.writeObject(message);
         } catch (IOException ex) {
