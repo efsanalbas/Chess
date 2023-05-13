@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package projeclient;
 
 /**
@@ -32,9 +28,7 @@ public class Chess {
     public static MyPanel currentClickedPanel;
     public static MyButton currentClickedButton;
     public static MyPanel rivalsPanel;
-//    public static MyButton rivalMoveTile;
     public static String rivalMoveTileName;
-    // public static MyPanel rivalMovePanel;
     public static String rivalMovePanelName;
 
     static int k = 8, l = 8, m = 8, n = 8, p = 8, r = 8, s = 8, t = 8;
@@ -248,7 +242,7 @@ public class Chess {
 
                     if (currentClickedButton.tileColor != null && Client.myTile.equals(currentClickedButton.tileColor)) {
                         // Rakibin ekranını güncelliyoruz
-                        
+
                         myPanels.get(index).setClicked(true);
                         moveControl(currentClickedButton, myPanels.get(index));
                         System.out.println(myPanels.get(index).name + " clicked");
@@ -282,7 +276,6 @@ public class Chess {
                 currentClickedButton = clickedButton;
                 parentPanel.setBackground(Color.green);
                 currentPanel = parentPanel;
-                System.out.println("Clicked button is on panel: " + parentPanel);
                 currentClickedPanel = parentPanel;
 
             }
@@ -294,14 +287,22 @@ public class Chess {
             JOptionPane.showMessageDialog(null, "Invalid move", "Square Filled", JOptionPane.WARNING_MESSAGE);
         }
         if (!destinationPanel.panelHasButton().equals(tile.tileColor) && !destinationPanel.panelHasButton().equals("blank")) {
-
+            if (destinationPanel.panelIncludeButton().type.equals("king")) {
+                JOptionPane.showMessageDialog(null, "CHECKMATE", "GAME END", JOptionPane.WARNING_MESSAGE);
+                Message endMessage = new Message(Message.Message_Type.End);
+                endMessage.content = Chess.usernameField.getText();
+                Client.Send(endMessage);
+                
+            }
             currentPanel.remove(tile);
             currentPanel.setBackground(currentPanel.previousColor);
             destinationPanel.remove(destinationPanel.panelIncludeButton());
             destinationPanel.add(tile);
             tile.locatedPanel = destinationPanel;
+
             destinationPanel.repaint();
             currentPanel.repaint();
+
         } else {
 
             currentPanel.remove(tile);
@@ -310,6 +311,7 @@ public class Chess {
             tile.locatedPanel = destinationPanel;
             destinationPanel.repaint();
             currentPanel.repaint();
+
         }
     }
 
@@ -352,7 +354,7 @@ public class Chess {
                 if (destinationRow > currentRow) {
                     // İleri hareket
                     for (int i = currentRow + 1; i < destinationRow; i++) {
-                        MyPanel panel = getPanelFromName(squareName(i, currentColumn));
+                        MyPanel panel = getPanelFromName(generateSquareName(i, currentColumn));
                         if (panel != null && !panel.panelHasButton().equals("blank")) {
                             JOptionPane.showMessageDialog(null, "Invalid move", "Square Filled", JOptionPane.WARNING_MESSAGE);
                             return;
@@ -362,7 +364,7 @@ public class Chess {
                 } else {
                     // Geri hareket
                     for (int i = currentRow - 1; i > destinationRow; i--) {
-                        MyPanel panel = getPanelFromName(squareName(i, currentColumn));
+                        MyPanel panel = getPanelFromName(generateSquareName(i, currentColumn));
                         if (panel != null && !panel.panelHasButton().equals("blank")) {
                             JOptionPane.showMessageDialog(null, "Invalid move", "Square Filled", JOptionPane.WARNING_MESSAGE);
                             return;
@@ -375,7 +377,7 @@ public class Chess {
                 if (destinationColumn > currentColumn) {
                     // Sağa hareket
                     for (int i = currentColumn + 1; i < destinationColumn; i++) {
-                        MyPanel panel = getPanelFromName(squareName(currentRow, i));
+                        MyPanel panel = getPanelFromName(generateSquareName(currentRow, i));
                         if (panel != null && !panel.panelHasButton().equals("blank")) {
                             JOptionPane.showMessageDialog(null, "Invalid move", "Square Filled", JOptionPane.WARNING_MESSAGE);
                             return;
@@ -385,7 +387,7 @@ public class Chess {
                 } else {
                     // Sola hareket
                     for (int i = currentColumn - 1; i > destinationColumn; i--) {
-                        MyPanel panel = getPanelFromName(squareName(currentRow, i));
+                        MyPanel panel = getPanelFromName(generateSquareName(currentRow, i));
                         if (panel != null && !panel.panelHasButton().equals("blank")) {
                             JOptionPane.showMessageDialog(null, "Invalid move", "Square Filled", JOptionPane.WARNING_MESSAGE);
                             return;
@@ -406,7 +408,7 @@ public class Chess {
                 // Çapraz sağa-ileri
                 if (destinationRow < currentRow && destinationColumn > currentColumn) {
                     for (int i = 1; i < rowDifference; i++) {
-                        MyPanel panel = getPanelFromName(squareName(currentRow - i, currentColumn + i));
+                        MyPanel panel = getPanelFromName(generateSquareName(currentRow - i, currentColumn + i));
                         if (panel != null && !panel.panelHasButton().equals("blank")) {
                             JOptionPane.showMessageDialog(null, "Invalid move", "Square Filled", JOptionPane.WARNING_MESSAGE);
                             return;
@@ -417,7 +419,7 @@ public class Chess {
                 } // Çapraz sola-ileri
                 else if (destinationRow < currentRow && destinationColumn < currentColumn) {
                     for (int i = 1; i < rowDifference; i++) {
-                        MyPanel panel = getPanelFromName(squareName(currentRow - i, currentColumn - i));
+                        MyPanel panel = getPanelFromName(generateSquareName(currentRow - i, currentColumn - i));
                         if (panel != null && !panel.panelHasButton().equals("blank")) {
                             JOptionPane.showMessageDialog(null, "Square Filled", "Invalid move", JOptionPane.WARNING_MESSAGE);
                             return;
@@ -428,7 +430,7 @@ public class Chess {
                 } // Çapraz sağa-geri
                 else if (destinationRow > currentRow && destinationColumn > currentColumn) {
                     for (int i = 1; i < rowDifference; i++) {
-                        MyPanel panel = getPanelFromName(squareName(currentRow + i, currentColumn + i));
+                        MyPanel panel = getPanelFromName(generateSquareName(currentRow + i, currentColumn + i));
                         if (panel != null && !panel.panelHasButton().equals("blank")) {
                             JOptionPane.showMessageDialog(null, "Square Filled", "Invalid move", JOptionPane.WARNING_MESSAGE);
                             return;
@@ -439,7 +441,7 @@ public class Chess {
                 } // Çapraz sola-geri
                 else if (destinationRow > currentRow && destinationColumn < currentColumn) {
                     for (int i = 1; i < rowDifference; i++) {
-                        MyPanel panel = getPanelFromName(squareName(currentRow + i, currentColumn - i));
+                        MyPanel panel = getPanelFromName(generateSquareName(currentRow + i, currentColumn - i));
                         if (panel != null && !panel.panelHasButton().equals("blank")) {
                             JOptionPane.showMessageDialog(null, "Invalid move", "Square Filled", JOptionPane.WARNING_MESSAGE);
                             return;
@@ -498,11 +500,11 @@ public class Chess {
 
     }
 
-    public static String squareName(int row, int column) {
+    public static String generateSquareName(int row, int column) {
         // satırı sütuna karşılık gelen harflerle birleştirerek kare ismini oluşturur.
-        char col = (char) ('A' + column);
-        char rw = (char) ('8' - row);
-        return "" + col + rw;
+        char c = (char) ('A' + column);
+        char r = (char) ('8' - row);
+        return "" + c + r;
     }
 
     public static MyPanel getPanelFromName(String name) {

@@ -1,25 +1,18 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
+
 package projeclient;
 
 import game.Message;
 import static game.Message.Message_Type.Name;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static projeclient.Chess.getPanelFromName;
-import static projeclient.Chess.makeMove;
 import static projeclient.Chess.moveControl;
 import static projeclient.Chess.rivalMovePanelName;
 import static projeclient.Chess.rivalMoveTileName;
-import static projeclient.Client.sendMove;
 
 /**
  *
@@ -67,6 +60,9 @@ class Listen extends Thread {
                         } else {
                             Client.myTile = "black";
                         }
+                        break;
+                    case End:
+                        System.out.println("Mesaj:"+received.content.toString()); //Oyunu kaybettiği bildirilir.
                         break;
                 }
             } catch (IOException ex) {
