@@ -32,9 +32,9 @@ public class Chess {
     public static MyPanel currentClickedPanel;
     public static MyButton currentClickedButton;
     public static MyPanel rivalsPanel;
-    public static MyButton rivalMoveTile;
+//    public static MyButton rivalMoveTile;
     public static String rivalMoveTileName;
-    public static MyPanel rivalMovePanel;
+    // public static MyPanel rivalMovePanel;
     public static String rivalMovePanelName;
 
     static int k = 8, l = 8, m = 8, n = 8, p = 8, r = 8, s = 8, t = 8;
@@ -245,20 +245,16 @@ public class Chess {
             myPanels.get(index).addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
+
                     if (currentClickedButton.tileColor != null && Client.myTile.equals(currentClickedButton.tileColor)) {
+                        // Rakibin ekranını güncelliyoruz
+                        
                         myPanels.get(index).setClicked(true);
                         moveControl(currentClickedButton, myPanels.get(index));
                         System.out.println(myPanels.get(index).name + " clicked");
                         Message msg = new Message(Message.Message_Type.Hamle);
                         msg.content = currentClickedButton.tileColor + " to " + currentClickedPanel.name + " to " + myPanels.get(index).name;
                         Client.Send(msg);
-
-                        // Rakibin ekranını güncelliyoruz
-                        if (rivalMoveTileName != null && rivalMovePanelName != null) {
-                            rivalMoveTile = getPanelFromName(rivalMoveTileName).panelIncludeButton();
-                            rivalMovePanel= getPanelFromName(rivalMovePanelName);
-                            moveControl(rivalMoveTile, rivalMovePanel);
-                        }
 
                     }
                 }
@@ -293,25 +289,27 @@ public class Chess {
         });
     }
 
-    public static void makeMove(MyButton tile, MyPanel square) {
-        if (!square.panelHasButton().equals("blank") && square.panelHasButton().equals(tile.tileColor)) { //Gidilmek istenen konum boş değilse ya da aynı renk taş içeriyorsa hamle yapılamaz.
+    public static void makeMove(MyButton tile, MyPanel destinationPanel, MyPanel currentPanel) {
+        if (!destinationPanel.panelHasButton().equals("blank") && destinationPanel.panelHasButton().equals(tile.tileColor)) { //Gidilmek istenen konum boş değilse ya da aynı renk taş içeriyorsa hamle yapılamaz.
             JOptionPane.showMessageDialog(null, "Invalid move", "Square Filled", JOptionPane.WARNING_MESSAGE);
         }
-        if (!square.panelHasButton().equals(tile.tileColor) && !square.panelHasButton().equals("blank")) {
-            tile.locatedPanel.remove(tile);
-            tile.locatedPanel.setBackground(tile.locatedPanel.previousColor);
-            square.remove(square.panelIncludeButton());
-            tile.locatedPanel = square;
-            square.add(tile);
-            square.repaint();
-            currentClickedPanel.repaint();
+        if (!destinationPanel.panelHasButton().equals(tile.tileColor) && !destinationPanel.panelHasButton().equals("blank")) {
+
+            currentPanel.remove(tile);
+            currentPanel.setBackground(currentPanel.previousColor);
+            destinationPanel.remove(destinationPanel.panelIncludeButton());
+            destinationPanel.add(tile);
+            tile.locatedPanel = destinationPanel;
+            destinationPanel.repaint();
+            currentPanel.repaint();
         } else {
-            tile.locatedPanel.remove(tile);
-            tile.locatedPanel.setBackground(tile.locatedPanel.previousColor);
-            square.add(tile);
-            tile.locatedPanel = square;
-            square.repaint();
-            currentClickedPanel.repaint();
+
+            currentPanel.remove(tile);
+            currentPanel.setBackground(currentPanel.previousColor);
+            destinationPanel.add(tile);
+            tile.locatedPanel = destinationPanel;
+            destinationPanel.repaint();
+            currentPanel.repaint();
         }
     }
 
@@ -325,22 +323,22 @@ public class Chess {
             // Piyonlar beyazsa sadece ileri yöne gidebilir
             if (tile.tileColor.equals("white")) {
                 if (destinationRow == currentRow + 1 && destinationColumn == currentColumn) {
-                    makeMove(tile, square);
+                    makeMove(tile, square, tile.locatedPanel);
                 } else if (currentRow == 66 && destinationRow == 68 && destinationColumn == currentColumn) {
-                    makeMove(tile, square);
+                    makeMove(tile, square, tile.locatedPanel);
                 } else if (!tile.tileColor.equals(square.panelIncludeButton().tileColor) && Math.abs(currentColumn - destinationColumn) == 1 && Math.abs(currentRow - destinationRow) == 1) {
-                    makeMove(tile, square);
+                    makeMove(tile, square, tile.locatedPanel);
                 } else {
                     JOptionPane.showMessageDialog(null, "Invalid move", "Pawn cannot move like this.", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
             } else {//Piyonlar siyahsa geri yöne de gidebilir.
                 if (destinationRow == currentRow - 1 && destinationColumn == currentColumn) {
-                    makeMove(tile, square);
+                    makeMove(tile, square, tile.locatedPanel);
                 } else if (currentRow == 71 && destinationRow == 69 && destinationColumn == currentColumn) {
-                    makeMove(tile, square);
+                    makeMove(tile, square, tile.locatedPanel);
                 } else if (!tile.tileColor.equals(square.panelIncludeButton().tileColor) && Math.abs(currentColumn - destinationColumn) == 1 && Math.abs(currentRow - destinationRow) == 1) {
-                    makeMove(tile, square);
+                    makeMove(tile, square, tile.locatedPanel);
                 } else {
                     JOptionPane.showMessageDialog(null, "Invalid move", "Pawn cannot move like this.", JOptionPane.WARNING_MESSAGE);
                     return;
@@ -360,7 +358,7 @@ public class Chess {
                             return;
                         }
                     }
-                    makeMove(tile, square);
+                    makeMove(tile, square, tile.locatedPanel);
                 } else {
                     // Geri hareket
                     for (int i = currentRow - 1; i > destinationRow; i--) {
@@ -370,7 +368,7 @@ public class Chess {
                             return;
                         }
                     }
-                    makeMove(tile, square);
+                    makeMove(tile, square, tile.locatedPanel);
                 }
             } else if (currentRow == destinationRow) {
                 // Yatay hareketler
@@ -383,7 +381,7 @@ public class Chess {
                             return;
                         }
                     }
-                    makeMove(tile, square);
+                    makeMove(tile, square, tile.locatedPanel);
                 } else {
                     // Sola hareket
                     for (int i = currentColumn - 1; i > destinationColumn; i--) {
@@ -393,7 +391,7 @@ public class Chess {
                             return;
                         }
                     }
-                    makeMove(tile, square);
+                    makeMove(tile, square, tile.locatedPanel);
                 }
             } else {
                 JOptionPane.showMessageDialog(null, "Rook cannot move like this.", "Invalid Move", JOptionPane.WARNING_MESSAGE);
@@ -414,7 +412,7 @@ public class Chess {
                             return;
                         }
                     }
-                    makeMove(tile, square);
+                    makeMove(tile, square, tile.locatedPanel);
 
                 } // Çapraz sola-ileri
                 else if (destinationRow < currentRow && destinationColumn < currentColumn) {
@@ -425,7 +423,7 @@ public class Chess {
                             return;
                         }
                     }
-                    makeMove(tile, square);
+                    makeMove(tile, square, tile.locatedPanel);
 
                 } // Çapraz sağa-geri
                 else if (destinationRow > currentRow && destinationColumn > currentColumn) {
@@ -436,7 +434,7 @@ public class Chess {
                             return;
                         }
                     }
-                    makeMove(tile, square);
+                    makeMove(tile, square, tile.locatedPanel);
 
                 } // Çapraz sola-geri
                 else if (destinationRow > currentRow && destinationColumn < currentColumn) {
@@ -447,11 +445,11 @@ public class Chess {
                             return;
                         }
                     }
-                    makeMove(tile, square);
+                    makeMove(tile, square, tile.locatedPanel);
                 }
                 // Yeme durumu
                 if (!tile.tileColor.equals(square.panelIncludeButton().tileColor)) {
-                    makeMove(tile, square);
+                    makeMove(tile, square, tile.locatedPanel);
                 }
             } else {
                 JOptionPane.showMessageDialog(null, "Bishop cannot move like this.", "Invalid move", JOptionPane.WARNING_MESSAGE);
@@ -466,7 +464,7 @@ public class Chess {
             if ((rowDifference == 2 && columnDifference == 1) || (rowDifference == 1 && columnDifference == 2)) {
                 // Hedef kare boş veya rakip taşının olduğu kare ise hamle yapılabilir
                 if (square.panelHasButton().equals("blank") || !tile.tileColor.equals(square.panelIncludeButton().tileColor)) {
-                    makeMove(tile, square);
+                    makeMove(tile, square, tile.locatedPanel);
                 } else {
                     JOptionPane.showMessageDialog(null, "Invalid move", "Cannot move there", JOptionPane.WARNING_MESSAGE);
                     return;
@@ -483,7 +481,7 @@ public class Chess {
             if ((rowDifference == 1 && columnDifference == 0) || (rowDifference == 0 && columnDifference == 1) || (rowDifference == 1 && columnDifference == 1)) {
                 // Önündeki kare boş ise şah ilerler veya karede rakip taş var ise şah rakibi yiyebilir.
                 if (square.panelHasButton().equals("blank") || !tile.tileColor.equals(square.panelIncludeButton().tileColor)) {
-                    makeMove(tile, square);
+                    makeMove(tile, square, tile.locatedPanel);
                 } else {
                     JOptionPane.showMessageDialog(null, "Invalid move", "Cannot move to this square", JOptionPane.WARNING_MESSAGE);
                     return;
@@ -495,7 +493,7 @@ public class Chess {
         }
         if (tile.type.equals("queen")) {
             //buraya gerekli kontrolleri ekleyeceğim.
-            makeMove(tile, square);
+            makeMove(tile, square, tile.locatedPanel);
         }
 
     }

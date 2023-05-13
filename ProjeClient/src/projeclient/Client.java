@@ -14,6 +14,11 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static projeclient.Chess.getPanelFromName;
+import static projeclient.Chess.makeMove;
+import static projeclient.Chess.moveControl;
+import static projeclient.Chess.rivalMovePanelName;
+import static projeclient.Chess.rivalMoveTileName;
 import static projeclient.Client.sendMove;
 
 /**
@@ -40,7 +45,11 @@ class Listen extends Thread {
                         System.out.println("Chess.rivalMoveTileName:" + Chess.rivalMoveTileName);
                         Chess.rivalMovePanelName = arrMoves[2];
                         System.out.println(" Chess.rivalMovePanelName:" + Chess.rivalMovePanelName);
-
+                        
+                        if (rivalMoveTileName != null && rivalMovePanelName != null) {
+                            //null pointer exception kontrolü ekle getPanelFromName(rivalMoveTileName).panelIncludeButton().locatedPanel için
+                            moveControl(getPanelFromName(rivalMoveTileName).panelIncludeButton(), getPanelFromName(rivalMovePanelName));
+                        }
                         break;
                     case Turn:
                         if (received.content.toString().equals(Client.myTile)) {
