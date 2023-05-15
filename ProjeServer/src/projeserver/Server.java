@@ -1,13 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package projeserver;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 import game.Message;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -23,12 +16,11 @@ import java.util.logging.Logger;
  */
 public class Server extends Thread {
 
+    static int i = 0;
     ServerSocket serverSocket;
     int port;
     boolean isListening;
     ArrayList<ServerClient> clients;
-    //Thread listenThread;
-    public static Semaphore pairTwo = new Semaphore(1, true);
 
     public Server(int port) {
         try {
@@ -66,19 +58,9 @@ public class Server extends Thread {
 
     public void removeClient(ServerClient server_client) {
         this.clients.remove(server_client);
-
     }
 
-    public ServerClient clientByIndex(int index) {
-        return this.clients.remove(index);
 
-    }
-
-//    public void SendBroadcast(Message message) throws IOException {
-//        for (ServerClient client : clients) {
-//            client.SendMessage(message);
-//        }
-//    }
     @Override
     public void run() {
 
@@ -93,9 +75,9 @@ public class Server extends Thread {
 
                 } else {
                     nclient.playerTile = "black";
-                    nclient.pairedClient = this.clients.get(0);
-                    this.clients.get(0).pairedClient = nclient;
-
+                    nclient.pairedClient = this.clients.get(i);
+                    this.clients.get(i).pairedClient = nclient;
+                    i = i + 2;
                 }
                 this.addClient(nclient);
                 nclient.Listen();

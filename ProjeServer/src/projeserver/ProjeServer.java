@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
+
 package projeserver;
 
 /**
@@ -14,8 +11,8 @@ public class ProjeServer {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        Server server = new Server(3000);
-        server.Listen();
+        Server server = new Server(3000); //Serveri olusturuyoruz ve 3000 nolu porttan dinlemeye basliyor.
+        server.Listen(); //server dinlemeye basliyor.
     }
     
 }

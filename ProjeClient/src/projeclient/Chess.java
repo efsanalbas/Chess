@@ -30,7 +30,6 @@ public class Chess {
     public static MyPanel rivalsPanel;
     public static String rivalMoveTileName;
     public static String rivalMovePanelName;
-
     static int k = 8, l = 8, m = 8, n = 8, p = 8, r = 8, s = 8, t = 8;
     static JFrame frame = new JFrame("Board");
     static Color color = new Color(162, 97, 57);
@@ -217,6 +216,7 @@ public class Chess {
 
         connectButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                connectButton.setEnabled(false);
                 Client.Start("127.0.0.1", 3000);
             }
         });
@@ -241,14 +241,12 @@ public class Chess {
                 public void mouseClicked(MouseEvent e) {
 
                     if (currentClickedButton.tileColor != null && Client.myTile.equals(currentClickedButton.tileColor)) {
-                        // Rakibin ekranını güncelliyoruz
-
                         myPanels.get(index).setClicked(true);
-                        moveControl(currentClickedButton, myPanels.get(index));
-                        System.out.println(myPanels.get(index).name + " clicked");
-                        Message msg = new Message(Message.Message_Type.Hamle);
-                        msg.content = currentClickedButton.tileColor + " to " + currentClickedPanel.name + " to " + myPanels.get(index).name;
-                        Client.Send(msg);
+                            moveControl(currentClickedButton, myPanels.get(index));
+                            System.out.println(myPanels.get(index).name + " clicked");
+                            Message msg = new Message(Message.Message_Type.Hamle);
+                            msg.content = currentClickedButton.tileColor + " to " + currentClickedPanel.name + " to " + myPanels.get(index).name;
+                            Client.Send(msg);
 
                     }
                 }
@@ -292,7 +290,7 @@ public class Chess {
                 Message endMessage = new Message(Message.Message_Type.End);
                 endMessage.content = Chess.usernameField.getText();
                 Client.Send(endMessage);
-                
+
             }
             currentPanel.remove(tile);
             currentPanel.setBackground(currentPanel.previousColor);

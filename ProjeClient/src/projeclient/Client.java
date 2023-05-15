@@ -1,4 +1,3 @@
-
 package projeclient;
 
 import game.Message;
@@ -35,12 +34,11 @@ class Listen extends Thread {
                         System.out.println("Hamle:" + received.content.toString());
                         String[] arrMoves = received.content.toString().split(" to ");
                         Chess.rivalMoveTileName = arrMoves[1];
-                        System.out.println("Chess.rivalMoveTileName:" + Chess.rivalMoveTileName);
+                        //System.out.println("Chess.rivalMoveTileName:" + Chess.rivalMoveTileName);
                         Chess.rivalMovePanelName = arrMoves[2];
-                        System.out.println(" Chess.rivalMovePanelName:" + Chess.rivalMovePanelName);
-                        
-                        if (rivalMoveTileName != null && rivalMovePanelName != null) {
-                            //null pointer exception kontrolü ekle getPanelFromName(rivalMoveTileName).panelIncludeButton().locatedPanel için
+                        // System.out.println(" Chess.rivalMovePanelName:" + Chess.rivalMovePanelName);
+
+                        if (rivalMoveTileName != null && rivalMovePanelName != null && getPanelFromName(rivalMoveTileName).panelIncludeButton().locatedPanel != null) {
                             moveControl(getPanelFromName(rivalMoveTileName).panelIncludeButton(), getPanelFromName(rivalMovePanelName));
                         }
                         break;
@@ -62,7 +60,7 @@ class Listen extends Thread {
                         }
                         break;
                     case End:
-                        System.out.println("Mesaj:"+received.content.toString()); //Oyunu kaybettiği bildirilir.
+                        System.out.println("Mesaj:" + received.content.toString()); //Oyunu kaybettiği bildirilir.
                         break;
                 }
             } catch (IOException ex) {
