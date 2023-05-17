@@ -5,7 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import game.Message;
-import static game.Message.Message_Type.Hamle;
+import static game.Message.Message_Type.Move;
 import static game.Message.Message_Type.Name;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -61,47 +61,47 @@ public class ServerClient extends Thread {
     @Override
     public void run() {//start metodu çalıştığında thread burayı çalıştırır.
 
-        //Player tile bağlanan clienta bildirilir.
-        this.SendMessage(Message.Message_Type.Tile, playerTile);
+        this.SendMessage(Message.Message_Type.Tile, playerTile);//Player tile bağlanan clienta bildirilir.
 
-        if (this.pairedClient != null) { //null değilse ikisi birbirine bağlanmıştır, öbürü burayı atlamıştır.(white)
-            this.SendMessage(Message.Message_Type.Turn, this.pairedClient.playerTile);
-            this.pairedClient.SendMessage(Message.Message_Type.Turn, this.pairedClient.playerTile); //rakibime ve bana gönderiyorum.
+        if (this.pairedClient != null) { //Rakip null değilse ikisi birbirine bağlanmıştır.
+            this.SendMessage(Message.Message_Type.Turn, this.pairedClient.playerTile); //Rakibimin taş rengini bana gönderiyorum
+            this.pairedClient.SendMessage(Message.Message_Type.Turn, this.pairedClient.playerTile); //Rakibime onun taş rengini gönderiyorum.
         }
 
         Message received = null;
 
-        while (this.isListening) {
+        while (this.isListening) { //isListening true olduğu sürece gelen mesajları dinler.
             try {
 
-                received = (Message) (input.readObject());
+                received = (Message) (input.readObject()); //message nesnesini alır ve türüne göre işlemleri gerçekleştirir.
                 switch (received.type) {
-                    case Name:
-                        System.out.println("Oyuncu adı:" + received.content.toString());
+                    case Name:    //Message tipi Name ise,
+                        System.out.println("Oyuncu adı:" + received.content.toString()); //Öncelikle oyuncu adını ekrana yazdırır.
                         break;
-                    case Hamle:
+                    case Move:  //Message tipi Move ise ,
                         String move = (String) received.content;
-                        String[] arrMoves = move.split(" to ");
-                        System.out.println(Arrays.toString(arrMoves));
-                        this.pairedClient.SendMessage(Message.Message_Type.Hamle, move);
+                        String[] arrMoves = move.split(" to "); //Oyuncunun gönderdiği stringi split yapar ve taşın başlangıç ve bitiş konumlarını alır.
+                        System.out.println(Arrays.toString(arrMoves));//Hangi renk taşın nereden nereye gitmek istediğini ekrana yazdırır.
+                        this.pairedClient.SendMessage(Message.Message_Type.Move, move);//Oyuncudan aldığım hamleyi rakibine de gönderiyorum çünkü onun ekranı da güncellenmeli.
                         break;
                     case Turn:
+                        if(received.content.equals(false)){
+                        this.pairedClient.SendMessage(Message.Message_Type.Turn, this.pairedClient.playerTile);
+                        }
                         break;
                     case Tile:
                         break;
-                    case End:
+                    case End://Şah yendiğinde oyunun bittiğini belirten mesajı rakibe gönderiyorum.
                         this.pairedClient.SendMessage(Message.Message_Type.End, "You failed " + received.content.toString() + " won the game.");
                         break;
                 }
 
             } catch (IOException ex) {
+                System.out.println("Error: Message couldn't get.");//Mesaj alınamadığında client oyundan çıkmıştır.
+                this.Stop(); // Bu durumda socket kapatılır ve dinlemeyi bırakır.
 
-                System.out.println("Hata: Mesaj alınamadı.");
-                this.Stop();
-
-            } catch (ClassNotFoundException ex) {
-                System.out.println("Hata: Class not found exception.");
-                this.Stop();
+            } catch (ClassNotFoundException ex) {//input.readObject() kısmında oluşabilecek hatalar burada yakalanır.
+                this.Stop();// Bu durumda socket kapatılır ve dinlemeyi bırakır.
             }
         }
     }

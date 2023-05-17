@@ -240,13 +240,21 @@ public class Chess {
                 @Override
                 public void mouseClicked(MouseEvent e) {
 
-                    if (currentClickedButton.tileColor != null && Client.myTile.equals(currentClickedButton.tileColor)) {
-                        myPanels.get(index).setClicked(true);
+                    if (currentClickedButton != null && Client.myTile.equals(currentClickedButton.tileColor)) {
+                        System.out.println("Client sırası:" + Client.isMyTurn);
+                        if (Client.isMyTurn) {
+                            myPanels.get(index).setClicked(true);
                             moveControl(currentClickedButton, myPanels.get(index));
                             System.out.println(myPanels.get(index).name + " clicked");
-                            Message msg = new Message(Message.Message_Type.Hamle);
+                            Message msg = new Message(Message.Message_Type.Move);
                             msg.content = currentClickedButton.tileColor + " to " + currentClickedPanel.name + " to " + myPanels.get(index).name;
                             Client.Send(msg);
+                            Client.isMyTurn = false;
+                            System.out.println("Client sırası:" + Client.isMyTurn);
+                            Message turnMessage = new Message(Message.Message_Type.Turn);
+                            turnMessage.content = false;
+                            Client.Send(turnMessage);
+                        }
 
                     }
                 }

@@ -30,7 +30,7 @@ class Listen extends Thread {
                 switch (received.type) {
                     case Name:
                         break;
-                    case Hamle:
+                    case Move:
                         System.out.println("Hamle:" + received.content.toString());
                         String[] arrMoves = received.content.toString().split(" to ");
                         Chess.rivalMoveTileName = arrMoves[1];
@@ -44,8 +44,11 @@ class Listen extends Thread {
                         break;
                     case Turn:
                         if (received.content.toString().equals(Client.myTile)) {
+                            System.out.println("Cevap:" + received.content.toString());
                             Client.isMyTurn = true;
                         } else {
+                            System.out.println("Cevap:" + received.content.toString());
+
                             Client.isMyTurn = false;
                         }
 
@@ -116,7 +119,7 @@ public class Client {
 
     public static void sendMove(String move) {
         try {
-            Message message = new Message(Message.Message_Type.Hamle);
+            Message message = new Message(Message.Message_Type.Move);
             message.content = move;
             output.writeObject(message);
             output.flush();
