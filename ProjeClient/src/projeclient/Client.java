@@ -38,8 +38,9 @@ class Listen extends Thread {
                         Chess.rivalMovePanelName = arrMoves[2];
                         // System.out.println(" Chess.rivalMovePanelName:" + Chess.rivalMovePanelName);
 
-                        if (rivalMoveTileName != null && rivalMovePanelName != null && getPanelFromName(rivalMoveTileName).panelIncludeButton().locatedPanel != null) {
+                        if (rivalMoveTileName != null && rivalMovePanelName != null && getPanelFromName(rivalMoveTileName).panelIncludeButton() != null && getPanelFromName(rivalMoveTileName).panelIncludeButton().locatedPanel != null) {
                             moveControl(getPanelFromName(rivalMoveTileName).panelIncludeButton(), getPanelFromName(rivalMovePanelName));
+                           
                         }
                         break;
                     case Turn:
