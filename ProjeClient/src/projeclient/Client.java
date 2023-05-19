@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import static projeclient.Chess.getPanelFromName;
 import static projeclient.Chess.moveControl;
 import static projeclient.Chess.rivalMovePanelName;
@@ -18,14 +19,15 @@ import static projeclient.Chess.rivalMoveTileName;
  * @author nurefsanalbas
  */
 class Listen extends Thread {
-
+    
     public void run() {
-        Message msg1 = new Message(Message.Message_Type.Name);
-        msg1.content = Chess.usernameField.getText();
-        Client.Send(msg1);
+        Message name = new Message(Message.Message_Type.Name);
+        name.content = Chess.usernameField.getText();
+        Client.Send(name);
+        Client.name=Chess.usernameField.getText();
         while (Client.socket.isConnected()) {
             try {
-
+                
                 Message received = (Message) (Client.input.readObject());
                 switch (received.type) {
                     case Name:
@@ -40,7 +42,7 @@ class Listen extends Thread {
 
                         if (rivalMoveTileName != null && rivalMovePanelName != null && getPanelFromName(rivalMoveTileName).panelIncludeButton() != null && getPanelFromName(rivalMoveTileName).panelIncludeButton().locatedPanel != null) {
                             moveControl(getPanelFromName(rivalMoveTileName).panelIncludeButton(), getPanelFromName(rivalMovePanelName));
-                           
+                            
                         }
                         break;
                     case Turn:
@@ -49,22 +51,26 @@ class Listen extends Thread {
                             Client.isMyTurn = true;
                         } else {
                             System.out.println("Cevap:" + received.content.toString());
-
+                            
                             Client.isMyTurn = false;
                         }
-
+                        
                         break;
-
+                    
                     case Tile:
                         if (received.content.toString().equals("white")) {
                             Client.myTile = "white";
-
+                            
                         } else {
                             Client.myTile = "black";
                         }
                         break;
                     case End:
                         System.out.println("Mesaj:" + received.content.toString()); //Oyunu kaybettiği bildirilir.
+                        JOptionPane.showMessageDialog(null, received.content.toString(), "GAME END", JOptionPane.WARNING_MESSAGE);
+                        for (MyButton tile : Chess.myButtons) {
+                            tile.setEnabled(false);
+                        }
                         break;
                 }
             } catch (IOException ex) {
@@ -72,11 +78,11 @@ class Listen extends Thread {
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(Listen.class.getName()).log(Level.SEVERE, null, ex);
             }
-
+            
         }
-
+        
     }
-
+    
 }
 
 public class Client {
@@ -89,7 +95,8 @@ public class Client {
     public static String myTile;
     public static String id;
     public static Boolean isMyTurn;
-
+    public static String name;
+    
     public static void Start(String ip, int port) {
         try {
 
@@ -99,25 +106,25 @@ public class Client {
             Client.input = new ObjectInputStream(Client.socket.getInputStream());
             // output stream
             Client.output = new ObjectOutputStream(Client.socket.getOutputStream());
-
+            
             Client.listenMe = new Listen();
-
+            
             Client.listenMe.start();
-
+            
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
     public static void Send(Message msg) {
         try {
             Client.output.writeObject(msg);
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        
     }
-
+    
     public static void sendMove(String move) {
         try {
             Message message = new Message(Message.Message_Type.Move);

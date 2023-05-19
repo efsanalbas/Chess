@@ -23,6 +23,7 @@ public class ServerClient extends Thread {
     ObjectInputStream input;  //Clienta mesaj gönderebilmek için tanımlandı.
     boolean isListening;     //Dinleme kontrolü için tanımlandı.
     public ServerClient pairedClient; //rakibim.
+    String pairedClientName="";
 
     public ServerClient(Socket soket) throws IOException { //Clientın mesajlarını serverda karşılamak için ServerClient objesi oluşturmam gerekiyordu ve burada constructor oluşturdum.
         this.socket = soket;
@@ -77,6 +78,7 @@ public class ServerClient extends Thread {
                 switch (received.type) {
                     case Name:    //Message tipi Name ise,
                         System.out.println("Oyuncu adı:" + received.content.toString()); //Öncelikle oyuncu adını ekrana yazdırır.
+            
                         break;
                     case Move:  //Message tipi Move ise ,
                         String move = (String) received.content;
@@ -92,7 +94,8 @@ public class ServerClient extends Thread {
                     case Tile:
                         break;
                     case End://Şah yendiğinde oyunun bittiğini belirten mesajı rakibe gönderiyorum.
-                        this.pairedClient.SendMessage(Message.Message_Type.End, "You failed " + received.content.toString() + " won the game.");
+                        this.SendMessage(Message.Message_Type.End,received.content.toString() + " you won the game.");
+                        this.pairedClient.SendMessage(Message.Message_Type.End, received.content.toString() +" won the game you Failed.");
                         break;
                 }
 
