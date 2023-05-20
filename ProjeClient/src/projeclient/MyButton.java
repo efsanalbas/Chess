@@ -4,51 +4,16 @@
  */
 package projeclient;
 
-import java.awt.Component;
-import java.util.ArrayList;
-
 /**
  *
  * @author nurefsanalbas
  */
-public class MyButton extends javax.swing.JButton {
-
-    public String buttonIndex;
-    public MyPanel locatedPanel;
-    public String type;
-    public String tileColor;
-
-    ArrayList<Character> avaliableWhitePawnLocations(MyButton pawn, int stepSize) {
-        char currentLocation = pawn.locatedPanel.row;
-        ArrayList<Character> list = calculateNextChars(currentLocation, 2);
-        return list;
-    }
-
-    ArrayList<Character> avaliableBlackPawnLocations(MyButton pawn, int stepSize) {
-        char currentLocation = pawn.locatedPanel.row;
-        ArrayList<Character> list = calculatePrevChars(currentLocation, 2);
-        return list;
-    }
-
-    ArrayList<Character> calculateNextChars(char ch, int stepSize) {
-        ArrayList<Character> nextCharArr = new ArrayList<>();
-        for (int i = 1; i <= stepSize; i++) {
-            int index = ch - 'A'; // karakterin alfabedeki sırasını hesaplar
-            char nextChar = (char) ('A' + index + i);
-            nextCharArr.add(nextChar);
-        }
-        return nextCharArr;
-    }
-
-    ArrayList<Character> calculatePrevChars(char ch, int stepSize) {
-        ArrayList<Character> nextCharArr = new ArrayList<>();
-        for (int i = 1; i <= stepSize; i++) {
-            int index = ch - 'A'; // karakterin alfabedeki sırasını hesaplar
-            char prevChar = (char) ('A' + index - i);
-            nextCharArr.add(prevChar);
-        }
-        return nextCharArr;
-    }
+public class MyButton extends javax.swing.JButton {//Satranç oyunundaki taşları buton olarak oluşturdum. 
+                                                   //Bu butonlara da özellik eklemek için myButton türünde özel bir sınıftan türettim.
+    public String buttonIndex; //Butonun bulunduğu panelin adını butonun adı olarak atadım.
+    public MyPanel locatedPanel; //Butonun bulunduğu panelin adı.
+    public String type; //Butonun türü.
+    public String tileColor; //Butonun rengi.
 
 
 }

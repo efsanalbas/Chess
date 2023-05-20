@@ -10,69 +10,57 @@ import javax.swing.JPanel;
  *
  * @author nurefsanalbas
  */
-public class MyPanel extends JPanel {
+public class MyPanel extends JPanel { //Kendine özel panel özellikleri ekleyebileceğim JPanelden extend alan MyPanel sınıfı oluşturdum.
 
-    public String name;
-    public Color previousColor;
-    public char row;//A,B,C,D,E,F,G,H
-    public String column;//1,2,3,4,5,6,7,8   
-    public boolean isClicked;
+    public String name;//square adı
+    public Color previousColor;//tıklanmadan önceki rengi
+    public char row;//satır adı A,B,C,D,E,F,G,H
+    public String column;//sütun rengi 1,2,3,4,5,6,7,8   
+    public boolean isClicked; //Panele tıklandıysa true olur.
 
-    public MyPanel() {
+    public MyPanel() { //Panel constructor'ı oluşturdum.
         super();
         this.name = name;
         isClicked = false;
 
     }
 
-    public boolean isClicked() {
+    public boolean isClicked() { //Panele tıklandığında bu metod çalışır.
         this.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                isClicked = true; // isClicked özelliğini true yap
-                setBackground(Color.GREEN);
-                repaint();
+            public void mouseClicked(java.awt.event.MouseEvent evt) { //Panele tıklanırsa,
+                isClicked = true; //IsClicked özelliğini true yaptım.
+                setBackground(Color.GREEN);//arka plan rengini yeşil yaptım.
+                repaint(); //Ekranı günceller.
             }
         });
         return isClicked;
     }
 
-    public String panelHasButton() {
-        Component[] components = this.getComponents();
+    public String panelHasButton() { //Panelde button varsa rengini döndürür yoksa boş yani "blank" döner.
+        Component[] components = this.getComponents();//panelin bileşenlerini alır.
         for (Component component : components) {
-            if (component instanceof MyButton) {
+            if (component instanceof MyButton) {//button türünde olanların rengini döner.
                 return ((MyButton) component).tileColor;
             }
         }
         return "blank";
     }
 
-    public MyButton panelIncludeButton() {
-        Component[] components = this.getComponents();
+    public MyButton panelIncludeButton() { //Panelde button varsa butonu döndürür yoksa null döner.
+        Component[] components = this.getComponents();//panelin bileşenlerini alır.
         for (Component component : components) {
-            if (component instanceof MyButton) {
+            if (component instanceof MyButton) {//button türünde olanların bileşenini döner.
                 return ((MyButton) component);
             }
         }
         return null;
     }
 
-    public void setClicked(boolean clicked) {
+    public void setClicked(boolean clicked) {//panele tıklandığında true olur.
         isClicked = clicked;
     }
 
-    public String getNameFromThePanel(MyPanel panel) {
-        // satır bilgisini al
-        char row = panel.row;
-
-        // sütun bilgisini al
-        String column = panel.column;
-
-        // satır ve sütunu birleştirerek panel adını oluştur
-        String panelName = String.valueOf(row) + column;
-
-        return panelName;
-    }
 
     
 }
